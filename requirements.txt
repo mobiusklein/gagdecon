@@ -1,0 +1,6 @@
+glypy>=0.0.9
+matplotlib>=1.4.3
+jinja2
+brainpy @ git://github.com/mobiusklein/brainpy
+ms_peak_picker @ git://github.com/mobiusklein/ms_peak_picker.git
+ms_deisotope @ git://github.com/mobiusklein/ms_deisotope.git

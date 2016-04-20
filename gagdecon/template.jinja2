@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <style type="text/css" media="screen">
+
+body {
+    font-family: Helvetica, sans-serif;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+tr td, tr th {
+    border: 1px solid grey;
+    border: 1px solid grey;
+    text-align: center;
+}
+    </style>
+</head>
+<body>
+<h2>GAGDecon</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th>m/z</th>
+            <th>charge</th>
+            <th>score</th>
+            <th>chain_length</th>
+            <th>HexN</th>
+            <th>HexNAc</th>
+            <th>HexA</th>
+            <th>Sulfate</th>
+            <th>Acetyl</th>
+            <th>Anhydromannose</th>
+            {% for loss in losses %}
+                <th>{{loss.name}} Loss</th>
+            {% endfor %}
+            <th>Observed Isotopic Distribution</th>
+            <th>Theoretical Iostopic Distribution</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for gag, peak, fit in results %}
+            <tr>
+                <td>{{peak.mz}}</td>
+                <td>{{peak.charge}}</td>
+                <td>{{"%0.4f"|format(peak.score)}}</td>
+                <td>{{gag.chain_length}}</td>
+                <td>{{gag.glycan_composition["HexN"]}}</td>
+                <td>{{gag.glycan_composition["HexNAc"]}}</td>
+                <td>{{gag.glycan_composition["HexA"]}}</td>
+                <td>{{gag.glycan_composition["@sulfate"]}}</td>
+                <td>{{gag.glycan_composition["@acetyl"]}}</td>
+                <td>{{gag.glycan_composition["Man2Anhydro"]}}</td>
+                {% for loss in losses %}
+                    <td> {{
+                    gag.glycan_composition[loss]
+                    }} </td>
+                {% endfor %}
+                <td>{{draw_envelope(peak.envelope)|png_plot}}</td>
+                <td>{{draw_tid(gag, peak.charge)|png_plot}}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>
