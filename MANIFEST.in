@@ -1,2 +1,2 @@
 include requirements.txt
-recursive-include gagdecon/ *.jinja2
+recursive-include gagdecon *.jinja2

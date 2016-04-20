@@ -25,19 +25,19 @@ class GAGDeconvoluter(object):
         self.composition_rules = composition_rules
         self.pick_peaks = pick_peaks
 
-    def deconvolute_file(self, peaklist_path, charge_range=(-1, -10)):
+    def deconvolute_file(self, peaklist_path, charge_range=(-1, -10), mass_error_tolerance=2e-5):
         if self.pick_peaks:
             peaklist = pick_peaks_from_file(peaklist_path)
         else:
             peaklist = read_peaklist(peaklist_path)
-        return self.deconvolute_peaklist(peaklist, charge_range)
+        return self.deconvolute_peaklist(peaklist, charge_range, mass_error_tolerance)
 
-    def deconvolute_peaklist(self, peaklist, charge_range=(-1, -10)):
+    def deconvolute_peaklist(self, peaklist, charge_range=(-1, -10), mass_error_tolerance=2e-5):
         database_builder = ChainCompositionBuilder(
             self.gag_type, self.length_range, self.has_anhydromanose,
             self.losses, self.composition_rules)
         database = list(database_builder)
-        return deconvolute(peaklist, database, charge_range)
+        return deconvolute(peaklist, database, charge_range, mass_error_tolerance)
 
     def _get_component_names(self):
         database_builder = ChainCompositionBuilder(
@@ -48,11 +48,13 @@ class GAGDeconvoluter(object):
 
 def run(peaklist_path, gag_type, length_range, has_anhydromanose=False, losses=None,
         composition_rules=None, max_charge=-10, output_path=None, output_format=('csv',),
-        pick_peaks=False):
+        pick_peaks=False, mass_error_tolerance=2e-5):
     dec = GAGDeconvoluter(gag_type, length_range, has_anhydromanose, losses, composition_rules)
 
     logger.info("Deconvoluting and Matching %s", peaklist_path)
-    results = dec.deconvolute_file(peaklist_path, charge_range=(-1, max_charge))
+    results = dec.deconvolute_file(
+        peaklist_path, charge_range=(-1, max_charge),
+        mass_error_tolerance=mass_error_tolerance)
 
     if output_format == "html" and not rich_output:
         output_format = "csv"
@@ -81,7 +83,7 @@ def run(peaklist_path, gag_type, length_range, has_anhydromanose=False, losses=N
 
 app = argparse.ArgumentParser("gagdecon")
 app.add_argument("-g", "--gag-type", choices=('hs', 'cs'), help='The type of GAG chain to produce')
-# app.add_argument("-r", "--reduced", default=None, help="The reducing end composition, e.g. H2")
+app.add_argument("-e", "--mass-error-tolerance", type=float, help="The mass error tolernace in parts-per-million")
 app.add_argument("-l", "--losses", action='append',
                  help="Any chemical loss compositions, e.g. H2O or NH. May specify more than once.")
 app.add_argument("-a", "--has-anhydromanose", action='store_true', required=False, default=False,
@@ -112,6 +114,8 @@ def main():
 
     logger.info("GAG Chain Range: %d-%d" % tuple(length_range))
 
+    mass_error_tolerance = args.mass_error_tolerance
+
     # reducing_end_type = args.reduced
     # if reducing_end_type:
     #     reducing_end_type = Composition(reducing_end_type)
@@ -125,7 +129,8 @@ def main():
 
     run(
         args.peaklist_path, gag_type, length_range, has_anhydromanose, molecular_composition_losses,
-        None, max_charge, output_path, output_format, pick_peaks=pick_peaks)
+        None, max_charge, output_path, output_format,
+        pick_peaks=pick_peaks, mass_error_tolerance=mass_error_tolerance)
 
 
 if __name__ == '__main__':

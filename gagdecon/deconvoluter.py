@@ -54,11 +54,11 @@ def read_peaklist(path):
     return peakreader.peaklist
 
 
-def deconvolute(peaklist, compositions, charge_range=(-1, -10)):
+def deconvolute(peaklist, compositions, charge_range=(-1, -10), mass_error_tolerance=2e-5):
     scorer = scoring.ScaledGTestFitter()
     scorer.select.minimum_score = 1.5
     dec = deconvolution.CompositionListDeconvoluter(peaklist, compositions, scorer=scorer)
-    return DeconvolutedResult.wrap(dec.deconvolute(charge_range=charge_range))
+    return DeconvolutedResult.wrap(dec.deconvolute(charge_range=charge_range, error_tolerance=mass_error_tolerance))
 
 
 class DeconvolutedResult(object):
@@ -70,6 +70,13 @@ class DeconvolutedResult(object):
         self.composition = composition
         self.peak = peak
         self.fit = fit
+
+    @property
+    def ppm_error(self):
+        acc = []
+        for obs, exp in zip(self.fit.experimental, self.fit.theoretical):
+            acc.append((obs.mz - exp.mz) / exp.mz)
+        return sum(acc) / float(len(acc))
 
     def __getitem__(self, key):
         try:
@@ -83,6 +90,8 @@ class DeconvolutedResult(object):
                 return self.composition.chain_length
             elif key == "intensity":
                 return self.peak.intensity
+            elif key == "ppm_error":
+                return self.ppm_error
             else:
                 return self.composition.glycan_composition[key]
         except:

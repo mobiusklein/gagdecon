@@ -16,6 +16,7 @@ setup(
         ]
     },
     zip_safe=False,
+    include_package_data=True,
     install_requires=required,
     maintainer='Joshua Klein',
     maintainer_email="jaklein@bu.edu",

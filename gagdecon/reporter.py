@@ -122,6 +122,7 @@ class CSVOutputWriter(object):
         self.fieldmap["score"] = "score"
         self.fieldmap['chain_length'] = "chain length"
         self.fieldmap['intensity'] = 'intensity'
+        self.fieldmap["ppm_error"] = 'ppm error'
         self.fieldmap.update(fieldmap)
 
     def write(self):
