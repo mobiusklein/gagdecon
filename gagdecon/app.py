@@ -8,7 +8,7 @@ from gagdecon.deconvoluter import deconvolute, read_peaklist, pick_peaks_from_fi
 from gagdecon.reporter import CSVOutputWriter, rich_output
 
 if rich_output:
-    from gagdecon.reporter import RichOutputWriter
+    from gagdecon.reporter import RichOutputWriter, FullSpectrumPlot
 
 logger = logging.getLogger("gagdecon")
 
@@ -37,6 +37,7 @@ class GAGDeconvoluter(object):
             self.gag_type, self.length_range, self.has_anhydromanose,
             self.losses, self.composition_rules)
         database = list(database_builder)
+        self.peaklist = peaklist
         return deconvolute(peaklist, database, charge_range, mass_error_tolerance)
 
     def _get_component_names(self):
@@ -74,6 +75,10 @@ def run(peaklist_path, gag_type, length_range, has_anhydromanose=False, losses=N
         elif output_format_ == 'html':
             logger.info("Writing HTML")
             RichOutputWriter(results, losses, output_path_).write()
+        elif output_format_ == 'plot':
+            output_path_ += ".pdf"
+            logger.info("Writing FullSpectrumPlot")
+            FullSpectrumPlot(results, dec.peaklist, path=output_path_).write()
         elif output_format_ == 'pickle':
             import pickle
             logger.info("Writing Pickle")
@@ -93,7 +98,7 @@ app.add_argument("-d", "--chain-length-range", nargs=2, type=int,
 app.add_argument("-c", "--max-charge", type=int, help='The maximum negative charge to search for')
 app.add_argument("-o", "--output-path", required=False, default=None, help='The path to write all output to')
 app.add_argument("-f", "--output-format", required=False, action='append', default=[],
-                 choices=('csv', 'html', 'pickle'), help="The format to write output to. May specify more than once.")
+                 choices=('csv', 'html', 'plot', 'pickle'), help="The format to write output to. May specify more than once.")
 
 app.add_argument("-p", "--pick-peaks", required=False, default=False, help="Should peak picking be performed")
 

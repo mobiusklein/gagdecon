@@ -57,7 +57,7 @@ def read_peaklist(path):
 def deconvolute(peaklist, compositions, charge_range=(-1, -10), mass_error_tolerance=2e-5):
     scorer = scoring.ScaledGTestFitter()
     scorer.select.minimum_score = 1.5
-    dec = deconvolution.CompositionListDeconvoluter(peaklist, compositions, scorer=scorer)
+    dec = deconvolution.CompositionListDeconvoluter(peaklist, compositions, scorer=scorer, use_subtraction=False)
     return DeconvolutedResult.wrap(dec.deconvolute(charge_range=charge_range, error_tolerance=mass_error_tolerance))
 
 

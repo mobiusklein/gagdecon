@@ -108,6 +108,46 @@ try:
                     f.flush()
             f.close()
             return self.path
+
+    class FullSpectrumPlot(object):
+        def __init__(self, results, peaklist, path='spectrum.pdf'):
+            self.results = results
+            self.peaklist = peaklist
+            self.path = path
+            self.ax = None
+
+        def _draw_whole_spectrum(self):
+            ax = draw_peaklist(self.peaklist, lw=0.25, alpha=0.5)
+            self.ax = ax
+            return ax
+
+        def _highlight_matched_envelopes(self):
+            ax = self.ax
+            for result in self.results:
+                score = result['score']
+                a = max(1 - score, 0.1)
+                draw_peaklist(result.fit.experimental, ax=ax, color='red', alpha=a, lw=0.5)
+
+        def _ghost_in_theoretical_envelopes(self):
+            ax = self.ax
+            for result in self.results:
+                draw_peaklist(result.fit.theoretical, ax=ax, color='green', alpha=0.5, lw=0.5)
+
+        def write(self):
+
+            ax = self._draw_whole_spectrum()
+            self._highlight_matched_envelopes()
+            self._ghost_in_theoretical_envelopes()
+
+            max_yticks = 500
+            xloc = plt.MaxNLocator(max_yticks)
+            ax.xaxis.set_major_locator(xloc)
+
+            fig = ax.get_figure()
+            fig.set_figwidth(120 * 5)
+            fig.savefig(self.path, bbox_inches="tight")
+            plt.close(fig)
+
 except ImportError:
     rich_output = False
 
