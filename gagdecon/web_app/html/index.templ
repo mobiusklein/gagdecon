@@ -1,0 +1,45 @@
+{%- extends "layout.templ" %}
+
+{% block body %}
+<div style='clear: both;'>
+    <div style='float: left; margin: 5px; width: 40%;'>
+        <h3>Run Search</h3>
+        <form method="post" accept-charset="utf-8" action='/run' enctype="multipart/form-data">
+            <label for='gag-type'>Glycosaminoglycan Type</label><br/>
+            <select id='gag-type' name='gag_type'>
+                <option value="hs">Heparin</option>
+                <option value='cs'>Non-Heparin</option>
+            </select><br/><br/>
+            <label>Chain Length Range</label><br/>
+            <input type='number' min=2 value=4 name='range_min' placeholder="Minimum Chain Length" style='width: 45px;' /> -
+            <input type='number' min=2 value=40 name='range_max' placeholder="Maximum Chain Length" style="width: 45px;"/> Monosaccharides
+
+            <br/><br/>
+            <label for="has_anhydromannose">Include Anhydromannose?</label> 
+            <input type='checkbox' name='has_anhydromannose' on="false"/><br/><br/>
+
+            <label for='losses'>Chemical Losses (One Per Line)</label><br/>
+            <textarea name='losses' placeholder="Formula" rows="3" cols=40></textarea>
+            <br/><br/>
+
+            <label for='max_charge'>Maximum Charge State (Negative)</label><br/>
+            <input type='number' name='max_charge' value="14" style='width: 45px;'>
+            <br/><br/>
+
+            <label for="mass_error_tolerance">Mass Accuracy (in PPM)</label>
+            <input type='number' name='mass_error_tolerance' min=0 step="1e-6" value="5e-6" style='width: 85px;' />
+            <br/><br/>            
+
+            <label for='peaklist_path'>Input Data CSV</label><br/>
+            <input type='file' name='peaklist_path' />
+            <label for="pick_peaks">Pick Peaks?</label> 
+            <input type='checkbox' name='pick_peaks' on="false"/><br/><br/>
+            <input type='submit'/>
+        </form>
+    </div>
+    <div style='float: left; margin: 5px; width: 40%;'>
+        <h3>View Results</h3>
+
+    </div>
+</div>
+{% endblock %}
