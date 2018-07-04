@@ -1,7 +1,7 @@
 import glypy
 from glypy.structure.monosaccharide import ReducedEnd
-from glypy.composition import glycan_composition
-from glypy.composition.glycan_composition import MolecularComposition, SubstituentResidue
+from glypy.structure import glycan_composition
+from glypy.structure.glycan_composition import MolecularComposition, SubstituentResidue
 from collections import OrderedDict
 
 
